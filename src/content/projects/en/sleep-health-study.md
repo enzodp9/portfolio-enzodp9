@@ -9,6 +9,7 @@ category: "Data / ML"
 stack: ["Python", "pandas", "NumPy", "scikit-learn", "matplotlib", "Jupyter", "pytest"]
 order: 10
 repo: "https://github.com/enzodp9/sleep-health-study"
+link: "https://sleep-health-study-bemwcspo4jmkvcceeb5x38.streamlit.app"
 ---
 
 ## Goal
