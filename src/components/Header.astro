@@ -1,0 +1,177 @@
+---
+import { site, nav } from '../data/site';
+import type { Lang } from '../data/site';
+
+interface Props {
+  lang?: Lang;
+  altHref?: string;
+}
+
+const { lang = 'es', altHref = lang === 'es' ? '/en' : '/' } = Astro.props;
+const homeHref = lang === 'en' ? '/en' : '/';
+const items = nav[lang];
+const selfHref = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href={homeHref} aria-label={`${site.name} — ${lang === 'en' ? 'home' : 'inicio'}`}>
+      <span class="brand-mark">{site.mark}</span>
+      <span class="brand-dot" aria-hidden="true"></span>
+    </a>
+
+    <nav class="nav" aria-label={lang === 'en' ? 'Main' : 'Principal'}>
+      {items.map((item) => (
+        <a class="nav-link" href={`${homeHref}${item.href}`}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="lang-switch" role="group" aria-label={lang === 'en' ? 'Language' : 'Idioma'}>
+      <a
+        class="lang-option"
+        href={lang === 'es' ? selfHref : altHref}
+        aria-current={lang === 'es' ? 'true' : undefined}
+      >ES</a>
+      <span class="lang-sep" aria-hidden="true">/</span>
+      <a
+        class="lang-option"
+        href={lang === 'en' ? selfHref : altHref}
+        aria-current={lang === 'en' ? 'true' : undefined}
+      >EN</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(8px);
+    z-index: 50;
+  }
+
+  /* Barra de registro: su ancho refleja el progreso de scroll de la página.
+     Fallback (--scroll-progress no seteada) = 1, o sea barra completa. */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(var(--scroll-progress, 1));
+    transform-origin: left;
+  }
+
+  .header-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    row-gap: 0.6rem;
+    column-gap: 1rem;
+    min-height: 3.5rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.9rem, 3vw, 1.75rem);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-left: auto;
+  }
+
+  .nav-link {
+    color: var(--muted);
+    border-bottom: 1px solid transparent;
+    padding-bottom: 1px;
+    transition: color 0.18s ease, border-color 0.18s ease;
+  }
+
+  .nav-link:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    padding-left: clamp(0.85rem, 2vw, 1.25rem);
+    border-left: 1px solid var(--line);
+  }
+
+  .lang-sep {
+    color: var(--line);
+  }
+
+  .lang-option {
+    color: var(--muted);
+    transition: color 0.18s ease;
+  }
+
+  .lang-option:hover {
+    color: var(--accent);
+  }
+
+  .lang-option[aria-current='true'] {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  @media (max-width: 720px) {
+    .brand {
+      order: 1;
+    }
+
+    .lang-switch {
+      order: 2;
+    }
+
+    .nav {
+      order: 3;
+      flex-basis: 100%;
+      flex-wrap: wrap;
+      row-gap: 0.5rem;
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .nav {
+      gap: 0.85rem;
+      font-size: 0.72rem;
+    }
+
+    .lang-switch {
+      padding-left: 0.65rem;
+    }
+  }
+</style>

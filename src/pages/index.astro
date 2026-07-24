@@ -1,0 +1,85 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import ProjectIndex from '../components/ProjectIndex.astro';
+import Experience from '../components/Experience.astro';
+import Education from '../components/Education.astro';
+import About from '../components/About.astro';
+import { site } from '../data/site';
+
+const all = (
+  await getCollection('projects', (entry: CollectionEntry<'projects'>) =>
+    entry.id.startsWith('es/')
+  )
+).sort((a, b) => a.data.order - b.data.order);
+
+const producto = all.filter((p) => p.data.category === 'Producto');
+const ia = all.filter((p) => p.data.category === 'IA / LLMs');
+const datos = all.filter((p) => p.data.category === 'Datos / ML');
+const power = all.filter((p) => p.data.category === 'Power Platform');
+
+const indexedCount = producto.length + ia.length + datos.length + power.length;
+const countLabel = `${String(indexedCount).padStart(2, '0')} ${
+  indexedCount === 1 ? 'entrada' : 'entradas'
+}`;
+---
+
+<BaseLayout
+  title={`${site.name} — Portfolio`}
+  description={site.description.es}
+  lang="es"
+  altHref="/en"
+>
+  <Hero lang="es" />
+  <Education lang="es" />
+  <Experience lang="es" />
+
+  <div id="proyectos" class="container projects">
+    <header class="projects-head" data-reveal="rule">
+      <h2 class="projects-title">Proyectos</h2>
+      <span class="projects-count mono">{countLabel}</span>
+    </header>
+
+    <ProjectIndex label="Producto" projects={producto} lang="es" />
+    <ProjectIndex label="IA / LLMs" projects={ia} lang="es" />
+    <ProjectIndex label="Datos / ML" projects={datos} lang="es" />
+    <ProjectIndex label="Power Platform" projects={power} lang="es" />
+  </div>
+
+  <About lang="es" />
+</BaseLayout>
+
+<style>
+  .projects {
+    margin-top: var(--rhythm);
+  }
+
+  .projects-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .projects-title {
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .projects-count {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
+    border-radius: var(--radius-md);
+    padding: 0.3rem 0.55rem;
+    white-space: nowrap;
+  }
+</style>

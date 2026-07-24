@@ -1,0 +1,234 @@
+---
+import type { Lang } from '../data/site';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'es' } = Astro.props;
+
+const utnCU = {
+  es: 'Universidad Tecnológica Nacional · Facultad Regional Concepción del Uruguay',
+  en: 'Universidad Tecnológica Nacional · Concepción del Uruguay Regional Faculty',
+}[lang];
+
+const content = {
+  es: {
+    sectionTitle: 'Formación Académica',
+    certLabel: 'Certificaciones y cursos',
+    formacion: [
+      {
+        title: 'Ingeniería en Sistemas de Información',
+        dates: '2018 – 2025',
+        org: utnCU,
+      },
+      {
+        title: 'Analista Universitario en Sistemas de Información',
+        dates: '2018 – 2023',
+        note: 'Título intermedio',
+        org: utnCU,
+      },
+    ],
+    cursos: [
+      { title: 'Associate AI Engineer for Developers', org: 'DataCamp' },
+      { title: 'PL-400: Microsoft Power Platform Developer', org: 'Udemy' },
+      { title: 'PL-900: Microsoft Power Platform Fundamentals', org: 'Udemy' },
+      { title: 'Formación en Front-End', org: 'Oracle Next Education (ONE)' },
+      { title: 'Curso de Alemán Básico', org: 'Universidad Nacional de Río Cuarto' },
+      {
+        title: 'CoNaIISI 2022 · 2023',
+        extra: 'Asistente y colaborador',
+        org: 'Congreso Nacional de Ingeniería Informática y Sistemas de Información',
+      },
+    ],
+  },
+  en: {
+    sectionTitle: 'Education',
+    certLabel: 'Certifications and courses',
+    formacion: [
+      {
+        title: 'Information Systems Engineering',
+        dates: '2018 – 2025',
+        org: utnCU,
+      },
+      {
+        title: 'University Technician in Information Systems',
+        dates: '2018 – 2023',
+        note: 'Intermediate degree',
+        org: utnCU,
+      },
+    ],
+    cursos: [
+      { title: 'Associate AI Engineer for Developers', org: 'DataCamp' },
+      { title: 'PL-400: Microsoft Power Platform Developer', org: 'Udemy' },
+      { title: 'PL-900: Microsoft Power Platform Fundamentals', org: 'Udemy' },
+      { title: 'Front-End Training', org: 'Oracle Next Education (ONE)' },
+      { title: 'Basic German Course', org: 'Universidad Nacional de Río Cuarto' },
+      {
+        title: 'CoNaIISI 2022 · 2023',
+        extra: 'Attendee and collaborator',
+        org: 'National Congress of Informatics Engineering and Information Systems',
+      },
+    ],
+  },
+}[lang];
+
+const { sectionTitle, certLabel, formacion, cursos } = content;
+---
+
+<section id="formacion" class="cv container" aria-labelledby="edu-title">
+  <header class="cv-head" data-reveal="rule">
+    <h2 id="edu-title" class="cv-title">{sectionTitle}</h2>
+  </header>
+
+  <ol class="cv-list">
+    {formacion.map((f, i) => (
+      <li class="entry" data-reveal="rise" style={`--i: ${i}`}>
+        <div class="entry-top">
+          <h3 class="entry-role">{f.title}</h3>
+          <span class="entry-dates mono">{f.dates}</span>
+        </div>
+        {f.note && <p class="entry-note">{f.note}</p>}
+        <p class="entry-org">{f.org}</p>
+      </li>
+    ))}
+  </ol>
+
+  <div class="sub-section">
+    <p class="sub-label">{certLabel}</p>
+    <ul class="cert-list">
+      {cursos.map((c, i) => (
+        <li class="cert-entry" data-reveal="rise" style={`--i: ${i}`}>
+          <span class="cert-title">
+            {c.title}{c.extra && <span class="cert-extra"> · {c.extra}</span>}
+          </span>
+          <span class="cert-org">{c.org}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cv {
+    margin-top: var(--rhythm);
+  }
+
+  .cv-head {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cv-title {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .cv-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .entry {
+    border-top: 1px solid var(--line);
+    padding: 1.4rem 0;
+  }
+
+  .entry:first-child {
+    border-top: 0;
+  }
+
+  .entry-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.2rem 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .entry-role {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+
+  .entry-dates {
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .entry-note {
+    margin: 0.25rem 0 0;
+    font-size: 0.84rem;
+    font-style: italic;
+  }
+
+  .entry-org {
+    margin: 0.15rem 0 0;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  /* Certificaciones subsección -------------------------------------------- */
+  .sub-section {
+    border-top: 1px solid var(--line);
+    padding-top: 1.4rem;
+  }
+
+  .sub-label {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin: 0 0 1rem;
+  }
+
+  .cert-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem 1.5rem;
+  }
+
+  .cert-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .cert-title {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
+  .cert-extra {
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .cert-org {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* Responsive ------------------------------------------------------------- */
+  @media (max-width: 560px) {
+    .entry-top {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+    }
+  }
+</style>

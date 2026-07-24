@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../data/site';
+---
+
+<BaseLayout
+  title={`404 — ${site.name}`}
+  description="Page not found."
+  lang="en"
+  altHref="/404"
+>
+  <section class="notfound container">
+    <span class="eyebrow">Error 404</span>
+    <h1 class="notfound-title">
+      route not found<span class="cursor" aria-hidden="true">▍</span>
+    </h1>
+    <p class="muted">
+      The requested resource does not exist in this record.
+    </p>
+    <a class="link mono back" href="/en">← back to home</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound {
+    padding-block: clamp(4rem, 12vw, 8rem);
+    min-height: 50vh;
+  }
+
+  .notfound-title {
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    letter-spacing: -0.03em;
+    margin: 1rem 0 1rem;
+  }
+
+  .cursor {
+    color: var(--accent);
+    font-weight: 400;
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    50.01%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .back {
+    display: inline-block;
+    font-size: 0.82rem;
+    margin-top: 1.5rem;
+  }
+</style>

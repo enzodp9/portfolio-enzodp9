@@ -1,0 +1,230 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import { site } from '../../../data/site';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', (entry) => entry.id.startsWith('en/'));
+  return projects.map((project) => ({
+    params: { slug: project.slug.replace(/^en\//, '') },
+    props: { project },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { code, title, summary, year, role, status, stack, category, repo, link } =
+  project.data;
+const { Content } = await project.render();
+
+const description = `${summary} — ${title} (${code}), a project by ${site.name}.`;
+const cleanSlug = project.slug.replace(/^en\//, '');
+---
+
+<BaseLayout
+  title={`${title} — ${site.name}`}
+  description={description}
+  lang="en"
+  altHref={`/projects/${cleanSlug}`}
+>
+  <article class="project container">
+    <a class="back link mono" href="/en/#proyectos">← back to index</a>
+
+    <header class="project-head">
+      <span class="project-code mono">{code}</span>
+      <h1 class="project-title">{title}</h1>
+      <p class="project-summary">{summary}</p>
+    </header>
+
+    <div class="project-body">
+      {/* Ficha técnica rail (top on mobile, side rail on desktop) */}
+      <aside class="rail" aria-label="Fact sheet">
+        <dl>
+          <div class="kv"><dt>year</dt><dd>{year}</dd></div>
+          <div class="kv"><dt>role</dt><dd>{role}</dd></div>
+          <div class="kv"><dt>status</dt><dd>{status}</dd></div>
+          <div class="kv"><dt>category</dt><dd>{category}</dd></div>
+          <div class="kv">
+            <dt>stack</dt>
+            <dd class="stack">
+              {stack.map((s) => <span class="chip">{s}</span>)}
+            </dd>
+          </div>
+          {repo && (
+            <div class="kv">
+              <dt>repo</dt>
+              <dd>
+                <a class="link rail-link" href={repo} target="_blank" rel="noopener noreferrer">
+                  <Icon name="github" /> view code →
+                </a>
+              </dd>
+            </div>
+          )}
+          {link && (
+            <div class="kv">
+              <dt>demo</dt>
+              <dd>
+                <a class="link rail-link" href={link} target="_blank" rel="noopener noreferrer">
+                  <Icon name="external" /> view demo →
+                </a>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </aside>
+
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .project {
+    padding-block: clamp(2rem, 6vw, 3.5rem) 0;
+  }
+
+  .back {
+    display: inline-block;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+  }
+
+  .back:hover {
+    color: var(--accent);
+  }
+
+  .project-code {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .project-title {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    margin: 0.75rem 0 0.75rem;
+  }
+
+  .project-summary {
+    font-size: 1rem;
+    max-width: 56ch;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+
+  .project-body {
+    display: grid;
+    grid-template-columns: 14rem 1fr;
+    gap: clamp(1.5rem, 5vw, 3rem);
+    margin-top: clamp(2rem, 5vw, 3rem);
+    align-items: start;
+  }
+
+  .rail {
+    position: sticky;
+    top: 4.5rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1.25rem;
+  }
+
+  .rail dl {
+    margin: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .kv {
+    display: grid;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+  }
+
+  .kv dt {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.64rem;
+    color: var(--muted);
+  }
+
+  .kv dd {
+    margin: 0;
+  }
+
+  .rail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+  }
+
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.28rem 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+  }
+
+  /* Markdown content ------------------------------------------------------ */
+  .prose :global(h2) {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    margin: 2.25rem 0 0.6rem;
+  }
+
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .prose :global(p) {
+    margin: 0 0 1.1rem;
+    max-width: 64ch;
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--accent-soft);
+    padding: 0.1rem 0.3rem;
+    border-radius: 2px;
+  }
+
+  .prose :global(ul) {
+    padding-left: 1.1rem;
+    margin: 0 0 1.1rem;
+  }
+
+  .prose :global(li) {
+    margin-bottom: 0.4rem;
+  }
+
+  @media (max-width: 720px) {
+    .project-body {
+      grid-template-columns: 1fr;
+    }
+
+    .rail {
+      position: static;
+    }
+  }
+</style>

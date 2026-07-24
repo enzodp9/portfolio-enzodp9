@@ -1,0 +1,48 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import ProjectRow from './ProjectRow.astro';
+import type { Lang } from '../data/site';
+
+interface Props {
+  label: string;
+  projects: CollectionEntry<'projects'>[];
+  lang?: Lang;
+}
+
+const { label, projects, lang = 'es' } = Astro.props;
+---
+
+<section class="group" aria-label={label}>
+  <header class="group-head">
+    <span class="eyebrow">{label}</span>
+    <span class="group-count mono muted">{String(projects.length).padStart(2, '0')}</span>
+  </header>
+  <ul class="group-list">
+    {projects.map((project, i) => <ProjectRow project={project} index={i} lang={lang} />)}
+  </ul>
+</section>
+
+<style>
+  .group {
+    margin-top: clamp(2.5rem, 6vw, 3.5rem);
+  }
+
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .group-count {
+    font-size: 0.72rem;
+  }
+
+  .group-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+</style>

@@ -1,0 +1,256 @@
+---
+import { links } from '../data/site';
+import type { Lang } from '../data/site';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'es' } = Astro.props;
+
+const stackGroups = [
+  {
+    label: 'low-code',
+    items: ['Power Platform', 'Dataverse', 'Power Apps', 'Power Automate', 'Power BI', 'Power Pages'],
+  },
+  {
+    label: lang === 'en' ? 'development' : 'desarrollo',
+    items: ['React', 'Next.js', 'TypeScript', 'Python', 'C#/.NET', 'NestJS'],
+  },
+  {
+    label: 'cloud',
+    items: ['Azure App Service', 'Azure Functions', 'Azure Container Apps', 'Static Web Apps', 'Azure SQL'],
+  },
+  {
+    label: lang === 'en' ? 'data' : 'datos',
+    items: ['SQL Server', 'PostgreSQL', 'SQLite', 'ETL', 'Pandas', 'Statsmodels', 'Pyomo'],
+  },
+  {
+    label: 'ai',
+    items: ['LLMs', 'RAG', 'MCP', 'Tool Calling', 'Embeddings', 'Vector Search', 'Prompt Engineering'],
+  },
+  {
+    label: 'devops',
+    items: ['GitHub Actions', 'CI/CD'],
+  },
+];
+
+const content = {
+  es: {
+    eyebrow: 'Stack / Sobre mí',
+    title: 'Sobre mí',
+    idiomasLabel: 'idiomas',
+    contactoLabel: 'contacto',
+    downloadCv: 'descargar CV ↓',
+    stackAria: 'Stack técnico',
+    idiomas: [
+      { lang: 'Español', level: 'nativo' },
+      { lang: 'Inglés', level: 'B1–B2' },
+      { lang: 'Alemán', level: 'A1' },
+    ],
+  },
+  en: {
+    eyebrow: 'Stack / About me',
+    title: 'About me',
+    idiomasLabel: 'languages',
+    contactoLabel: 'contact',
+    downloadCv: 'download CV ↓',
+    stackAria: 'Technical stack',
+    idiomas: [
+      { lang: 'Spanish', level: 'native' },
+      { lang: 'English', level: 'B1–B2' },
+      { lang: 'German', level: 'A1' },
+    ],
+  },
+}[lang];
+---
+
+<section id="sobre-mi" class="about container" aria-labelledby="about-title">
+  <span class="eyebrow" data-reveal="rise" style="--i: 0">{content.eyebrow}</span>
+  <h2 id="about-title" class="about-title" data-reveal="rise" style="--i: 1">{content.title}</h2>
+
+  <div class="about-grid">
+    <div class="about-prose" data-reveal="rise" style="--i: 2">
+      {lang === 'en' ? (
+        <p>
+          I'm an Information Systems Engineer with experience developing
+          software, data, and artificial intelligence solutions for industrial
+          environments. I'm currently part of UD-TI para la Industria, where I
+          design and implement applications on Microsoft Power Platform,
+          AI-based solutions, and integration architectures to optimize
+          operational processes. I also develop <a class="link" href="/en/projects/miga-software">MIGA Software</a>,
+          my own SaaS product for managing bakeries and pastry shops.
+        </p>
+      ) : (
+        <p>
+          Soy Ingeniero en Sistemas de Información con experiencia en el desarrollo
+          de soluciones de software, datos e inteligencia artificial aplicadas a
+          entornos industriales. Actualmente formo parte de UD-TI para la
+          Industria, donde diseño e implemento aplicaciones sobre Microsoft Power
+          Platform, soluciones basadas en IA y arquitecturas de integración para
+          optimizar procesos operativos. Además, desarrollo <a class="link" href="/projects/miga-software">MIGA Software</a>,
+          un SaaS propio para la gestión de panaderías y pastelerías.
+        </p>
+      )}
+      <p class="muted">
+        {lang === 'en'
+          ? "I'm interested in building software that solves real problems and can be sustained in production."
+          : 'Me interesa construir software que resuelva problemas reales y pueda mantenerse en producción.'}
+      </p>
+    </div>
+
+    <dl class="about-meta">
+      <div class="kv">
+        <dt>{content.idiomasLabel}</dt>
+        <dd>
+          {content.idiomas.map((i) => (
+            <span class="idioma">{i.lang} <span class="muted">({i.level})</span></span>
+          ))}
+        </dd>
+      </div>
+      <div class="kv">
+        <dt>{content.contactoLabel}</dt>
+        <dd>
+          <a class="link" href={`mailto:${links.email}`}>{links.email}</a>
+          <a class="link accent-link" href={links.cv}>{content.downloadCv}</a>
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  <dl class="stack-list" aria-label={content.stackAria}>
+    {stackGroups.map((g) => (
+      <div class="srow">
+        <dt>{g.label}</dt>
+        <dd class="chips">
+          {g.items.map((item) => <span class="chip">{item}</span>)}
+        </dd>
+      </div>
+    ))}
+  </dl>
+</section>
+
+<style>
+  .about {
+    margin-top: var(--rhythm);
+  }
+
+  .about-title {
+    font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+    margin: 0.5rem 0 1.75rem;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: clamp(1.5rem, 5vw, 3rem);
+    align-items: start;
+  }
+
+  .about-prose p:last-child {
+    margin-bottom: 0;
+  }
+
+  .about-meta {
+    margin: 0;
+    display: grid;
+    gap: 0.9rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1.25rem;
+  }
+
+  .kv {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+  }
+
+  .kv dt {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.66rem;
+    color: var(--muted);
+  }
+
+  .kv dd {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .accent-link {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .accent-link:hover {
+    border-bottom-color: var(--accent);
+  }
+
+  /* Stack ------------------------------------------------------------------ */
+  .stack-list {
+    margin: clamp(2rem, 5vw, 3rem) 0 0;
+    display: grid;
+    gap: 0.65rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1.5rem;
+  }
+
+  .srow {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .srow dt {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.64rem;
+    color: var(--muted);
+    padding-top: 0.3rem;
+  }
+
+  .srow dd {
+    margin: 0;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 0.28rem 0.6rem;
+    transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 640px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 460px) {
+    .srow {
+      grid-template-columns: 5.5rem 1fr;
+      gap: 0.6rem;
+    }
+  }
+</style>

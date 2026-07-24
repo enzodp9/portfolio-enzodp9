@@ -1,0 +1,132 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { Lang } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  lang?: Lang;
+  altHref?: string;
+}
+
+const { title, description, lang = 'es', altHref } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const altURL = altHref ? new URL(altHref, Astro.site) : undefined;
+const skipLabel = lang === 'en' ? 'Skip to content' : 'Saltar al contenido';
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    {altURL && (
+      <>
+        <link rel="alternate" hreflang={lang === 'es' ? 'en' : 'es'} href={altURL} />
+        <link rel="alternate" hreflang="x-default" href={lang === 'es' ? canonical : altURL} />
+      </>
+    )}
+
+    {/* Open Graph básico */}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'es_AR'} />
+    <meta name="twitter:card" content="summary" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{skipLabel}</a>
+    <Header lang={lang} altHref={altHref} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+
+    <script>
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // --- Revelado por ítem (listas): una sola vez, al entrar en viewport ---
+      const riseItems = document.querySelectorAll('[data-reveal="rise"]');
+
+      if (!prefersReduced && riseItems.length) {
+        if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver(
+            (entries) => {
+              for (const entry of entries) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('is-in');
+                  io.unobserve(entry.target);
+                }
+              }
+            },
+            { threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
+          );
+          riseItems.forEach((el) => io.observe(el));
+
+          // Red de seguridad: si algo queda sin revelarse (pestaña en
+          // segundo plano, render headless, etc.), lo mostramos igual.
+          window.setTimeout(() => {
+            riseItems.forEach((el) => el.classList.add('is-in'));
+          }, 2500);
+        } else {
+          riseItems.forEach((el) => el.classList.add('is-in'));
+        }
+      }
+
+      // --- Líneas ligadas al scroll: barra del header + hairlines de
+      // encabezado. Se alargan y se achican en vivo con la posición de
+      // scroll (sin transición CSS: el propio refresco a 60fps ya es
+      // suave). Si hay reduced-motion, nunca se pisan las variables y
+      // quedan en su fallback estático (progreso completo). ---
+      const ruleItems = document.querySelectorAll<HTMLElement>('[data-reveal="rule"]');
+
+      if (!prefersReduced) {
+        const root = document.documentElement;
+        let ticking = false;
+
+        const updateScrollLines = () => {
+          ticking = false;
+
+          const scrollable = root.scrollHeight - window.innerHeight;
+          const globalProgress = scrollable > 0
+            ? Math.min(Math.max(window.scrollY / scrollable, 0), 1)
+            : 0;
+          root.style.setProperty('--scroll-progress', globalProgress.toFixed(4));
+
+          const vh = window.innerHeight;
+          const start = vh * 0.85;
+          const end = vh * 0.35;
+
+          ruleItems.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            const raw = (start - rect.top) / (start - end);
+            const progress = Math.min(Math.max(raw, 0), 1);
+            el.style.setProperty('--progress', progress.toFixed(4));
+          });
+        };
+
+        const requestUpdate = () => {
+          if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateScrollLines);
+          }
+        };
+
+        updateScrollLines();
+        window.addEventListener('scroll', requestUpdate, { passive: true });
+        window.addEventListener('resize', requestUpdate);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import type { Lang } from '../data/site';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index?: number;
+  lang?: Lang;
+}
+
+const { project, index = 0, lang = 'es' } = Astro.props;
+const { code, title, summary, repo, link } = project.data;
+const cleanSlug = project.slug.replace(/^(es|en)\//, '');
+const href = lang === 'en' ? `/en/projects/${cleanSlug}` : `/projects/${cleanSlug}`;
+const viewLiveLabel = lang === 'en' ? `View ${title} in production` : `Ver ${title} en producción`;
+const viewRepoLabel = lang === 'en' ? `View ${title} repository on GitHub` : `Ver repositorio de ${title} en GitHub`;
+---
+
+<li class="card" data-reveal="rise" style={`--i: ${index}`}>
+  <div class="card-body">
+    <a class="card-title-link" href={href}>
+      <span class="card-head">
+        <span class="card-code mono">{code}</span>
+        <span class="card-title">{title}</span>
+      </span>
+    </a>
+    <p class="card-summary">{summary}</p>
+  </div>
+
+  {(repo || link) && (
+    <span class="card-actions">
+      {link && (
+        <a
+          class="card-icon"
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={viewLiveLabel}
+        >
+          <Icon name="external" />
+        </a>
+      )}
+      {repo && (
+        <a
+          class="card-icon"
+          href={repo}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={viewRepoLabel}
+        >
+          <Icon name="github" />
+        </a>
+      )}
+    </span>
+  )}
+</li>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.35rem;
+    transition: transform 0.2s var(--ease-out-quint), border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover,
+  .card:focus-within {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+    box-shadow: 0 14px 28px -18px rgba(20, 22, 27, 0.18);
+  }
+
+  .card-body {
+    min-width: 0;
+  }
+
+  .card-title-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-code {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.02rem;
+    letter-spacing: -0.005em;
+  }
+
+  .card-summary {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 60ch;
+  }
+
+  .card-actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    color: var(--muted);
+    font-size: 0.85rem;
+    transition: border-color 0.18s ease, color 0.18s ease;
+  }
+
+  .card-icon:hover,
+  .card-icon:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  @media (max-width: 460px) {
+    .card {
+      padding: 1rem;
+    }
+  }
+</style>
